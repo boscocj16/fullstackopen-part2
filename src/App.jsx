@@ -6,17 +6,16 @@ const Course = ({ course }) => {
   return (
     <div>
       <h1>{course.name}</h1>
-      <ul>
-        {course.parts.map(part => (
-          <li key={part.id}>
-            {part.name} {part.exercises} exercises
-          </li>
-        ))}
-      </ul>
+      {course.parts.map(part => (
+        <div key={part.id}>
+          {part.name} {part.exercises}
+        </div>
+      ))}
       <p><strong>Total exercises: {totalExercises}</strong></p>
     </div>
   );
 }
+
 const App = () => {
   const course = {
     id: 1,
@@ -41,7 +40,7 @@ const App = () => {
         name: 'Redux',
         exercises: 11,
         id: 4
-      },
+      }
     ]
   };
 

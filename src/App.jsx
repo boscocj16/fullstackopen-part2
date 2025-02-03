@@ -1,26 +1,49 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas' }
-  ]) 
-  const [newName, setNewName] = useState('')
+  ]);
+  const [newName, setNewName] = useState('');
+
+  const handleNameChange = (event) => {
+    setNewName(event.target.value);
+  };
+
+  const handleAddPerson = (event) => {
+    event.preventDefault(); 
+
+    if (persons.some(person => person.name === newName)) {
+      alert(`${newName} is already added to phonebook`);
+      setNewName('');
+      return;  
+    }
+
+    const newPerson = { name: newName };
+    setPersons(persons.concat(newPerson));
+    setNewName(''); 
+  };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
+      <form onSubmit={handleAddPerson}>
         <div>
-          name: <input />
+          name: <input value={newName} onChange={handleNameChange} />
         </div>
         <div>
           <button type="submit">add</button>
         </div>
       </form>
-      <h2>Numbers</h2>
-      ...
-    </div>
-  )
-}
 
-export default App
+      <h2>Numbers</h2>
+      <ul>
+        {persons.map((person, index) => (
+          <li key={index}>{person.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default App;

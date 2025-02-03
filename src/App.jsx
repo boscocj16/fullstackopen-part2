@@ -1,5 +1,8 @@
 import React from 'react';
+
 const Course = ({ course }) => {
+  const totalExercises = course.parts.reduce((sum, part) => sum + part.exercises, 0);
+
   return (
     <div>
       <h1>{course.name}</h1>
@@ -10,6 +13,7 @@ const Course = ({ course }) => {
           </li>
         ))}
       </ul>
+      <p><strong>Total exercises: {totalExercises}</strong></p>
     </div>
   );
 }
@@ -32,7 +36,12 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
-      }
+      },
+      {
+        name: 'Redux',
+        exercises: 11,
+        id: 4
+      },
     ]
   };
 

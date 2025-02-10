@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 import personService from './services/persons';
 
+const Notification = ({ message, type }) => {
+  if (!message) return null;
+
+  const notificationStyle = {
+    color: type === 'success' ? 'green' : 'red',
+    background: type === 'success' ? '#d4edda' : '#f8d7da',
+    fontSize: 16,
+    border: `2px solid ${type === 'success' ? 'green' : 'red'}`,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5
+  };
+
+  return <div style={notificationStyle}>{message}</div>;
+};
+
 const Filter = ({ searchTerm, handleSearchChange }) => (
   <div>
     search: <input value={searchTerm} onChange={handleSearchChange} />
@@ -41,12 +57,18 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [notification, setNotification] = useState({ message: null, type: '' });
 
   useEffect(() => {
     personService.getAll()
       .then(initialPersons => setPersons(initialPersons))
       .catch(error => console.error("Error fetching data:", error));
   }, []);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: null, type: '' }), 3000);
+  };
 
   const handleNameChange = (event) => setNewName(event.target.value);
   const handleNumberChange = (event) => setNewNumber(event.target.value);
@@ -64,8 +86,12 @@ const App = () => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson));
             setNewName('');
             setNewNumber('');
+            showNotification(`Updated ${newName}'s number`);
           })
-          .catch(error => console.error("Error updating person:", error));
+          .catch(error => {
+            console.error("Error updating person:", error);
+            showNotification(`Failed to update ${newName}.`, 'error');
+          });
       }
       return;
     }
@@ -76,8 +102,12 @@ const App = () => {
         setPersons([...persons, returnedPerson]);
         setNewName('');
         setNewNumber('');
+        showNotification(`Added ${newName}`);
       })
-      .catch(error => console.error("Error adding person:", error));
+      .catch(error => {
+        console.error("Error adding person:", error);
+        showNotification(`Failed to add ${newName}.`, 'error');
+      });
   };
 
   const handleDeletePerson = (id, name) => {
@@ -85,8 +115,12 @@ const App = () => {
       personService.remove(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== id));
+          showNotification(`Deleted ${name}`);
         })
-        .catch(error => console.error("Error deleting person:", error));
+        .catch(error => {
+          console.error("Error deleting person:", error);
+          showNotification(`Failed to delete ${name}.`, 'error');
+        });
     }
   };
 
@@ -97,6 +131,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} type={notification.type} />
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
       <h3>Add a new</h3>
       <PersonForm 

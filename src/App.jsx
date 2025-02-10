@@ -21,14 +21,17 @@ const PersonForm = ({ newName, newNumber, handleNameChange, handleNumberChange, 
   </form>
 );
 
-const Person = ({ person }) => (
-  <li>{person.name} {person.number}</li>
+const Person = ({ person, handleDelete }) => (
+  <li>
+    {person.name} {person.number} 
+    <button onClick={() => handleDelete(person.id, person.name)}>delete</button>
+  </li>
 );
 
-const Persons = ({ filteredPersons }) => (
+const Persons = ({ filteredPersons, handleDelete }) => (
   <ul>
     {filteredPersons.map(person => (
-      <Person key={person.id} person={person} />
+      <Person key={person.id} person={person} handleDelete={handleDelete} />
     ))}
   </ul>
 );
@@ -70,6 +73,16 @@ const App = () => {
       .catch(error => console.error("Error adding person:", error));
   };
 
+  const handleDeletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.remove(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+        })
+        .catch(error => console.error("Error deleting person:", error));
+    }
+  };
+
   const filteredPersons = persons.filter(person => 
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -87,7 +100,7 @@ const App = () => {
         handleAddPerson={handleAddPerson} 
       />
       <h3>Numbers</h3>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} handleDelete={handleDeletePerson} />
     </div>
   );
 };

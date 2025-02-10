@@ -41,10 +41,7 @@ const App = () => {
 
   useEffect(() => {
     axios.get('http://localhost:3001/persons')
-      .then(response => {
-        console.log("Fetched data:", response.data); 
-        setPersons(response.data);
-      })
+      .then(response => setPersons(response.data))
       .catch(error => console.error("Error fetching data:", error));
   }, []);
 
@@ -62,10 +59,15 @@ const App = () => {
       return;
     }
 
-    const newPerson = { name: newName, number: newNumber, id: persons.length + 1 };
-    setPersons(persons.concat(newPerson));
-    setNewName('');
-    setNewNumber('');
+    const newPerson = { name: newName, number: newNumber };
+
+    axios.post('http://localhost:3001/persons', newPerson)
+      .then(response => {
+        setPersons([...persons, response.data]);
+        setNewName('');
+        setNewNumber('');
+      })
+      .catch(error => console.error("Error adding person:", error));
   };
 
   const filteredPersons = persons.filter(person => 

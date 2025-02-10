@@ -6,6 +6,8 @@ const getAll = () => axios.get(baseUrl).then(response => response.data);
 
 const create = (newPerson) => axios.post(baseUrl, newPerson).then(response => response.data);
 
-const remove = (id) => axios.delete(`${baseUrl}/${id}`).then(response => response.data);
+const update = (id, updatedPerson) => axios.put(`${baseUrl}/${id}`, updatedPerson).then(response => response.data);
 
-export default { getAll, create, remove };
+const remove = (id) => axios.delete(`${baseUrl}/${id}`).then(() => id);
+
+export default { getAll, create, update, remove };

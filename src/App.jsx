@@ -55,15 +55,22 @@ const App = () => {
   const handleAddPerson = (event) => {
     event.preventDefault();
 
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to the phonebook`);
-      setNewName('');
-      setNewNumber('');
+    const existingPerson = persons.find(person => person.name === newName);
+    if (existingPerson) {
+      if (window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
+        const updatedPerson = { ...existingPerson, number: newNumber };
+        personService.update(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson));
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch(error => console.error("Error updating person:", error));
+      }
       return;
     }
 
     const newPerson = { name: newName, number: newNumber };
-
     personService.create(newPerson)
       .then(returnedPerson => {
         setPersons([...persons, returnedPerson]);
